@@ -159,6 +159,11 @@ async def main(port: int = 8080):
     print("Waiting for connections...")
     
     async def health_check(connection, request):
+        # Allow WebSocket upgrades to pass through
+        if "Upgrade" in request.headers and request.headers["Upgrade"].lower() == "websocket":
+            return None
+            
+        # Intercept HTTP health checks on / and /health
         if request.path == "/health" or request.path == "/":
             return connection.respond(200, "OK")
     
