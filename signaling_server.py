@@ -158,7 +158,11 @@ async def main(port: int = 8080):
     print(f"Starting signaling server on ws://0.0.0.0:{port}")
     print("Waiting for connections...")
     
-    async with websockets.serve(handle_client, "0.0.0.0", port):
+    async def health_check(connection, request):
+        if request.path == "/health" or request.path == "/":
+            return connection.respond(200, "OK")
+    
+    async with websockets.serve(handle_client, "0.0.0.0", port, process_request=health_check):
         await asyncio.Future()  # Run forever
 
 
